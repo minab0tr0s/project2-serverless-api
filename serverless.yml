@@ -1,0 +1,18 @@
+# serverless.yml
+
+service: project2-serverless-api
+
+frameworkVersion: '^4'
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1 # You can change this to your preferred region
+
+functions:
+  createTodo:
+    handler: handler.create_todo # Points to the create_todo function in handler.py
+    events:
+      - httpApi:
+          path: /todos
+          method: post
