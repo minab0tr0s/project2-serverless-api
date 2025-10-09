@@ -1,5 +1,3 @@
-# serverless.yml
-
 service: project2-serverless-api
 
 frameworkVersion: '^4'
@@ -7,12 +5,65 @@ frameworkVersion: '^4'
 provider:
   name: aws
   runtime: python3.9
-  region: us-east-1 # You can change this to your preferred region
+  region: us-east-1
+  environment:
+    TODOS_TABLE: TodosTable
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+          Resource:
+            - "Fn::GetAtt": [ TodosTable, Arn ]
 
 functions:
   createTodo:
-    handler: handler.create_todo # Points to the create_todo function in handler.py
+    handler: handler.create_todo
     events:
       - httpApi:
           path: /todos
           method: post
+  listTodos:
+    handler: handler.list_todos
+    events:
+      - httpApi:
+          path: /todos
+          method: get
+  getTodo:
+    handler: handler.get_todo
+    events:
+      - httpApi:
+          path: /todos/{id}
+          method: get
+  updateTodo:
+    handler: handler.update_todo
+    events:
+      - httpApi:
+          path: /todos/{id}
+          method: put
+  deleteTodo:
+    handler: handler.delete_todo
+    events:
+      - httpApi:
+          path: /todos/{id}
+          method: delete
+
+resources:
+  Resources:
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: TodosTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
