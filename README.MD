@@ -1,4 +1,4 @@
-# Project 2: Fully Serverless To-Do List API
+Fully Serverless To-Do List API
 
 ## 🚀 Description
 
